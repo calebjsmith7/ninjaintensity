@@ -1,0 +1,40 @@
+{
+  "hosting": {
+    "public": "out",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "redirects": [
+      { "source": "/ninja-warrior-classes-castle-rock", "destination": "/#classes", "type": 301 },
+      { "source": "/parkour-classes-castle-rock", "destination": "/#classes", "type": 301 },
+      { "source": "/ocr-training-castle-rock", "destination": "/#classes", "type": 301 },
+      { "source": "/sports-performance-training-castle-rock", "destination": "/#classes", "type": 301 },
+      { "source": "/nifit-fitness-classes-castle-rock", "destination": "/#classes", "type": 301 },
+      { "source": "/ninja-fitness-classes-castle-rock", "destination": "/#classes", "type": 301 },
+      { "source": "/american-ninja-warrior-camp-castle-rock", "destination": "/#classes", "type": 301 },
+      { "source": "/birthday-party-places-castle-rock", "destination": "/#parties", "type": 301 },
+      { "source": "/summer-camps-castle-rock", "destination": "/#camps", "type": 301 },
+      { "source": "/youthcamps", "destination": "/#camps", "type": 301 },
+      { "source": "/spring-break-camp", "destination": "/#camps", "type": 301 },
+      { "source": "/fall-break-camp-castle-rock", "destination": "/#camps", "type": 301 },
+      { "source": "/open-gym-castle-rock", "destination": "/#more", "type": 301 },
+      { "source": "/parents-night-out-castle-rock", "destination": "/#more", "type": 301 },
+      { "source": "/competitions", "destination": "/#more", "type": 301 },
+      { "source": "/cold-plunge-red-light-therapy", "destination": "/#more", "type": 301 },
+      { "source": "/team-building-castle-rock", "destination": "/#team", "type": 301 },
+      { "source": "/classinquiry", "destination": "/#contact", "type": 301 },
+      { "source": "/schedule", "destination": "/#contact", "type": 301 },
+      { "source": "/waivers", "destination": "/#contact", "type": 301 }
+    ],
+    "headers": [
+      {
+        "source": "/_next/static/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      },
+      {
+        "source": "/images/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+      }
+    ]
+  }
+}
