@@ -36,6 +36,12 @@ export const links = {
 // sheet loads in the browser. See app/_components/SiteContent.tsx.
 export const cmsSheetId = "1b5qL8rYaW2DYOY99wc2e-RAmLuv3Tl7j-5GiiZgDEhs";
 
+// Web app URL (ends in /exec) of the Apps Script in google-apps-script/contact-submissions.gs.
+// It adds each contact form submission as a row in a private Google Sheet. While this is blank,
+// the form falls back to opening the visitor's email app.
+export const contactEndpoint =
+  "https://script.google.com/macros/s/AKfycby3XVHV-hh8xceP4czz_AyxXMrqDzEW1DK1Jju9MKzRqEAmUSsJNwcUpuRpR7DzdSxyUw/exec";
+
 export const announcement = {
   text: "Thanksgiving Break Camp Nov 23–25 is coming up quick. Spots are limited!",
   href: "#camps",

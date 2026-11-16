@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { business, links } from "../data";
+import { business, contactEndpoint, links } from "../data";
 import { Reveal } from "./Reveal";
 import { Phone } from "./ui";
 
@@ -17,30 +17,71 @@ const interests = [
   "Something else",
 ];
 
+type Submission = Record<"name" | "email" | "phone" | "interest" | "date" | "message" | "website", string>;
+
+function mailtoHref(s: Submission) {
+  const details = [
+    `Name: ${s.name}`,
+    s.email && `Email: ${s.email}`,
+    s.phone && `Phone: ${s.phone}`,
+    `Interested in: ${s.interest}`,
+    s.date && `Preferred date: ${s.date}`,
+  ].filter(Boolean);
+  const body = [details.join("\n"), s.message].filter(Boolean).join("\n\n");
+  return `mailto:${business.email}?subject=${encodeURIComponent(`Website inquiry: ${s.interest}`)}&body=${encodeURIComponent(body)}`;
+}
+
 /**
- * Static hosting has no server, so this form opens the visitor's email app with a
- * pre-filled message. Swap `onSubmit` for a form service (e.g. Formspree) or a
- * Firebase Function later if you want submissions collected automatically.
+ * Submissions are posted to a Google Apps Script web app (see google-apps-script/contact-submissions.gs),
+ * which adds a row to a private Google Sheet. Until `contactEndpoint` is set, the form opens the
+ * visitor's email app with a pre-filled message instead.
  */
 export function Contact() {
   const [interest, setInterest] = useState(interests[0]);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState("");
+  const [last, setLast] = useState<Submission | null>(null);
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const body = [
-      `Name: ${data.get("name")}`,
-      `Phone: ${data.get("phone")}`,
-      `Interested in: ${interest}`,
-      data.get("date") ? `Preferred date: ${data.get("date")}` : "",
-      "",
-      String(data.get("message") ?? ""),
-    ]
-      .filter((l) => l !== "")
-      .join("\n");
-    window.location.href = `mailto:${business.email}?subject=${encodeURIComponent(
-      `Website inquiry: ${interest}`,
-    )}&body=${encodeURIComponent(body)}`;
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const get = (k: string) => String(data.get(k) ?? "").trim();
+    const submission: Submission = {
+      name: get("name"),
+      email: get("email"),
+      phone: get("phone"),
+      interest,
+      date: get("date"),
+      message: get("message"),
+      website: get("website"),
+    };
+
+    if (!submission.email && !submission.phone) {
+      setStatus("error");
+      setError("Please add an email or phone number so we can get back to you.");
+      return;
+    }
+
+    if (!contactEndpoint) {
+      window.location.href = mailtoHref(submission);
+      return;
+    }
+
+    setStatus("sending");
+    setError("");
+    setLast(submission);
+    try {
+      // Plain-text body keeps this a "simple" request, which Apps Script accepts without a CORS preflight.
+      const res = await fetch(contactEndpoint, { method: "POST", body: JSON.stringify(submission) });
+      const result = (await res.json()) as { ok?: boolean };
+      if (!result.ok) throw new Error("Not saved");
+      form.reset();
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+      setError("Sorry, your message didn't go through.");
+    }
   }
 
   const field =
@@ -107,50 +148,96 @@ export function Contact() {
         </Reveal>
 
         <Reveal delay={0.15}>
-          <form onSubmit={onSubmit} className="rounded-[2rem] bg-ink p-6 shadow-2xl shadow-ink/40 sm:p-8">
-            <h3 className="font-display text-3xl uppercase text-white">Send us a message</h3>
-            <p className="mt-1 text-sm text-mute">This doesn&apos;t sign you up. We&apos;ll get back to you!</p>
-
-            <fieldset className="mt-6">
-              <legend className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">I&apos;m interested in</legend>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {interests.map((i) => (
-                  <button
-                    type="button"
-                    key={i}
-                    onClick={() => setInterest(i)}
-                    aria-pressed={interest === i}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      interest === i ? "scale-105 bg-ninja text-white" : "bg-white/5 text-white/70 hover:bg-white/10"
-                    }`}
-                  >
-                    {i}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <label className="sr-only" htmlFor="name">Name</label>
-              <input id="name" name="name" required placeholder="Your name" className={field} autoComplete="name" />
-              <label className="sr-only" htmlFor="phone">Phone</label>
-              <input id="phone" name="phone" type="tel" placeholder="Phone" className={field} autoComplete="tel" />
-              {interest === "Birthday party" && (
-                <>
-                  <label className="sr-only" htmlFor="date">Preferred party date</label>
-                  <input id="date" name="date" type="date" className={`${field} sm:col-span-2 [color-scheme:dark]`} />
-                </>
-              )}
-              <label className="sr-only" htmlFor="message">Message</label>
-              <textarea id="message" name="message" rows={4} placeholder="Ages, questions, anything we should know…" className={`${field} sm:col-span-2`} />
+          {status === "sent" ? (
+            <div className="flex min-h-full flex-col justify-center rounded-[2rem] bg-ink p-6 shadow-2xl shadow-ink/40 sm:p-8" role="status">
+              <h3 className="font-display text-4xl uppercase text-white">Message sent!</h3>
+              <p className="mt-3 text-white/80">
+                Thanks for reaching out. We&apos;ll get back to you soon. Need an answer fast? Call us at{" "}
+                <a href={business.phoneHref} className="font-semibold text-white underline underline-offset-4">
+                  {business.phone}
+                </a>
+                .
+              </p>
+              <button
+                type="button"
+                onClick={() => setStatus("idle")}
+                className="mt-6 self-start rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+              >
+                Send another message
+              </button>
             </div>
-            <button
-              type="submit"
-              className="mt-5 w-full rounded-full bg-ninja py-4 text-sm font-semibold uppercase tracking-wider text-white transition-all hover:-translate-y-0.5 hover:bg-ninja-soft"
-            >
-              Send message →
-            </button>
-          </form>
+          ) : (
+            <form onSubmit={onSubmit} className="rounded-[2rem] bg-ink p-6 shadow-2xl shadow-ink/40 sm:p-8">
+              <h3 className="font-display text-3xl uppercase text-white">Send us a message</h3>
+              <p className="mt-1 text-sm text-mute">This doesn&apos;t sign you up. We&apos;ll get back to you!</p>
+
+              <fieldset className="mt-6">
+                <legend className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">I&apos;m interested in</legend>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {interests.map((i) => (
+                    <button
+                      type="button"
+                      key={i}
+                      onClick={() => setInterest(i)}
+                      aria-pressed={interest === i}
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        interest === i ? "scale-105 bg-ninja text-white" : "bg-white/5 text-white/70 hover:bg-white/10"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <label className="sr-only" htmlFor="name">Name</label>
+                <input id="name" name="name" required placeholder="Your name" className={`${field} sm:col-span-2`} autoComplete="name" />
+                <label className="sr-only" htmlFor="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="Email" className={field} autoComplete="email" />
+                <label className="sr-only" htmlFor="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" placeholder="Phone" className={field} autoComplete="tel" />
+                {interest === "Birthday party" && (
+                  <>
+                    <label className="sr-only" htmlFor="date">Preferred party date</label>
+                    <input id="date" name="date" type="date" className={`${field} sm:col-span-2 [color-scheme:dark]`} />
+                  </>
+                )}
+                <label className="sr-only" htmlFor="message">Message</label>
+                <textarea id="message" name="message" rows={4} placeholder="Ages, questions, anything we should know…" className={`${field} sm:col-span-2`} />
+                {/* Spam trap: hidden from people, but bots fill it in. */}
+                <div className="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden>
+                  <label htmlFor="website">Website</label>
+                  <input id="website" name="website" tabIndex={-1} autoComplete="off" />
+                </div>
+              </div>
+              {status === "error" && (
+                <p className="mt-4 rounded-2xl bg-ninja/15 px-4 py-3 text-sm text-white" role="alert">
+                  {error}{" "}
+                  {last && error.startsWith("Sorry") && (
+                    <>
+                      Please{" "}
+                      <a href={mailtoHref(last)} className="font-semibold underline underline-offset-4">
+                        email us
+                      </a>{" "}
+                      or call{" "}
+                      <a href={business.phoneHref} className="font-semibold underline underline-offset-4">
+                        {business.phone}
+                      </a>
+                      .
+                    </>
+                  )}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={status === "sending"}
+                className="mt-5 w-full rounded-full bg-ninja py-4 text-sm font-semibold uppercase tracking-wider text-white transition-all hover:-translate-y-0.5 hover:bg-ninja-soft disabled:pointer-events-none disabled:opacity-60"
+              >
+                {status === "sending" ? "Sending…" : "Send message →"}
+              </button>
+            </form>
+          )}
         </Reveal>
       </div>
 
