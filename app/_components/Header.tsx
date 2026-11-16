@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
-import { announcement, business, links, nav } from "../data";
+import { business, links, nav } from "../data";
+import { isExternal, useSiteContent } from "./SiteContent";
+import { isShowing, useToday } from "./UpcomingOnly";
 import { Phone } from "./ui";
 
 export function Header() {
@@ -11,6 +13,8 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+  const { announcement } = useSiteContent();
+  const today = useToday();
 
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 40));
 
@@ -36,18 +40,21 @@ export function Header() {
 
   return (
     <>
-      <a
-        href={announcement.href}
-        className="group relative z-50 block overflow-hidden bg-ninja px-4 py-2 text-center text-xs font-semibold uppercase tracking-widest text-white sm:text-sm"
-      >
-        <span className="relative z-10">
-          {announcement.text}{" "}
-          <span className="underline decoration-2 underline-offset-4 group-hover:decoration-white/60">
-            More info
+      {announcement.text && isShowing(announcement.end, today) && (
+        <a
+          href={announcement.href || "#top"}
+          {...(isExternal(announcement.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className="group relative z-50 block overflow-hidden bg-ninja px-4 py-2 text-center text-xs font-semibold uppercase tracking-widest text-white sm:text-sm"
+        >
+          <span className="relative z-10">
+            {announcement.text}{" "}
+            <span className="underline decoration-2 underline-offset-4 group-hover:decoration-white/60">
+              More info
+            </span>
           </span>
-        </span>
-        <span className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 transition-all duration-700 group-hover:left-[110%]" />
-      </a>
+          <span className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 transition-all duration-700 group-hover:left-[110%]" />
+        </a>
+      )}
 
       <header
         className={`sticky top-0 z-40 transition-all duration-300 ${

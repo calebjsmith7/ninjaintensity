@@ -31,9 +31,15 @@ export const links = {
   nscYouth: "https://www.ninjamasterapp.com/events/7226-ninja-intensity-nsc-youth-qualifier",
 };
 
+// Google Sheet that drives the "CMS" sections below (top bar, break camps, summer camp,
+// parents night out, competitions). The values in this file are the fallback shown until the
+// sheet loads in the browser. See app/_components/SiteContent.tsx.
+export const cmsSheetId = "1b5qL8rYaW2DYOY99wc2e-RAmLuv3Tl7j-5GiiZgDEhs";
+
 export const announcement = {
   text: "Thanksgiving Break Camp Nov 23–25 is coming up quick. Spots are limited!",
   href: "#camps",
+  end: "2026-11-25", // "" = never hide
 };
 
 export const nav = [
@@ -237,12 +243,14 @@ export const party = {
   ],
 };
 
-// Upcoming school break camps. Entries whose `end` date has passed hide automatically.
-export const camps = [
-  { label: "Thanksgiving Break", dates: "Mon–Wed · Nov 23–25", end: "2026-11-25" },
-  { label: "Black Friday", dates: "Fri · Nov 27", end: "2026-11-27" },
-  { label: "Christmas Break 1", dates: "Mon–Wed · Dec 21–23", end: "2026-12-23" },
-  { label: "Christmas Break 2", dates: "Dec 28–30", end: "2026-12-30" },
+// Upcoming school break camps. Entries whose `end` date has passed hide automatically ("" = never hide).
+export type Camp = { days: string; dates: string; title: string; href: string; end: string };
+
+export const camps: Camp[] = [
+  { days: "Mon–Wed", dates: "Nov 23–25", title: "Thanksgiving Break", href: links.campRegister, end: "2026-11-25" },
+  { days: "Fri", dates: "Nov 27", title: "Black Friday", href: links.campRegister, end: "2026-11-27" },
+  { days: "Mon–Wed", dates: "Dec 21–23", title: "Christmas Break 1", href: links.campRegister, end: "2026-12-23" },
+  { days: "", dates: "Dec 28–30", title: "Christmas Break 2", href: links.campRegister, end: "2026-12-30" },
 ];
 
 export const campFaq = [
@@ -256,11 +264,27 @@ export const campFaq = [
 ];
 
 export const summerCamp = {
-  note: "Summer camp is back for 2027. Check back soon for weeks!",
+  title: "Summer camp",
+  image: "/images/summer-camp.png",
+  header: "Back for 2027",
+  body: "Summer camp is back for 2027. Check back soon for weeks!",
   options: [
     { name: "Morning", time: "9:00 AM – 12:00 PM", member: "$225", nonMember: "$250" },
     { name: "All Day", time: "9:00 AM – 3:00 PM", member: "$400", nonMember: "$425" },
   ],
+  // Blank hides the register button (e.g. before registration opens).
+  href: "",
+  end: "", // "" = never hide
+};
+
+export const parentsNight = {
+  badge: "2nd Saturday monthly",
+  header: "Parents Night Out",
+  // **double asterisks** render as bold
+  body: "6–9 PM. For just **$40 per ninja**, your kids get three hours of fun games and exciting ninja activities. Space is limited and fills up fast!",
+  href: links.parentsNight,
+  image: "/images/parents-night-2.jpg",
+  end: "", // "" = never hide
 };
 
 export const openGym = {
@@ -275,24 +299,30 @@ export const openGym = {
   note: "Non-member safety orientation required ($5 additional). No-tolerance rule: break the rules more than twice and you'll be asked to leave.",
 };
 
-export const competitions = [
-  {
-    name: "Friday the 13th Beginner Comp",
-    date: "Friday, Nov 13 · 6:30 PM",
-    end: "2026-11-13",
-    body: "A beginner comp for any novice ninja. 7u, 9u, 11u and 13u divisions. A great way to test your skills and have fun (we promise it won't be scary).",
-    href: links.beginnerComp,
-    cta: "Sign up",
-  },
-  {
-    name: "NSC Youth Qualifier",
-    date: "Jan 16 & 17",
-    end: "2027-01-17",
-    body: "All athletes run the Hybrid and Speed courses, with the top 10 combined in open and female advancing to the Burnout course. Top 3 in each youth group (9U–13U) earn a spot at the NSC Youth West Sectional in Tempe, AZ (June 5–6, 2027).",
-    href: links.nscYouth,
-    cta: "Schedule & sign up",
-  },
-];
+// Entries whose `end` date has passed hide automatically ("" = never hide).
+export type Competition = { name: string; date: string; end: string; body: string; href: string; cta: string };
+
+export const competitions: { header: string; events: Competition[] } = {
+  header: "Competitions @ Intensity",
+  events: [
+    {
+      name: "Friday the 13th Beginner Comp",
+      date: "Friday, Nov 13 · 6:30 PM",
+      end: "2026-11-13",
+      body: "A beginner comp for any novice ninja. 7u, 9u, 11u and 13u divisions. A great way to test your skills and have fun (we promise it won't be scary).",
+      href: links.beginnerComp,
+      cta: "Sign up",
+    },
+    {
+      name: "NSC Youth Qualifier",
+      date: "Jan 16 & 17",
+      end: "2027-01-17",
+      body: "All athletes run the Hybrid and Speed courses, with the top 10 combined in open and female advancing to the Burnout course. Top 3 in each youth group (9U–13U) earn a spot at the NSC Youth West Sectional in Tempe, AZ (June 5–6, 2027).",
+      href: links.nscYouth,
+      cta: "Schedule & sign up",
+    },
+  ],
+};
 
 export const team = {
   intro:

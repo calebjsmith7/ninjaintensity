@@ -9,11 +9,13 @@ import { Marquee } from "./_components/Marquee";
 import { More } from "./_components/More";
 import { Parties } from "./_components/Parties";
 import { Programs } from "./_components/Programs";
+import { SiteContentProvider } from "./_components/SiteContent";
 import { Team } from "./_components/Team";
 
 export default function Home() {
   return (
     <MotionConfig reducedMotion="user">
+      <SiteContentProvider>
       <Header />
       <main>
         <Hero />
@@ -27,6 +29,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      </SiteContentProvider>
     </MotionConfig>
   );
 }

@@ -1,10 +1,21 @@
+"use client";
+
 import Image from "next/image";
-import { competitions, links, openGym } from "../data";
+import { openGym } from "../data";
 import { Reveal } from "./Reveal";
+import { RichText, imageSrc, isExternal, useSiteContent } from "./SiteContent";
 import { Button, SectionHeading } from "./ui";
-import { UpcomingOnly } from "./UpcomingOnly";
+import { isShowing, useToday } from "./UpcomingOnly";
 
 export function More() {
+  const { parentsNight, competitions } = useSiteContent();
+  const pnoImage = imageSrc(parentsNight.image);
+  const today = useToday();
+  const showPno = isShowing(parentsNight.end, today);
+  const events = competitions.events.filter((c) => isShowing(c.end, today));
+  // The competitions card disappears once every event in it has passed.
+  const showComps = events.length > 0;
+
   return (
     <section id="more" className="relative bg-bone py-24 text-ink sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -17,7 +28,7 @@ export function More() {
 
         <div className="mt-14 grid gap-5 lg:grid-cols-6">
           {/* Open Gym */}
-          <Reveal className="grid overflow-hidden rounded-[2rem] bg-white shadow-sm sm:grid-cols-[1fr_1.3fr] lg:col-span-4">
+          <Reveal className={`grid overflow-hidden rounded-[2rem] bg-white shadow-sm sm:grid-cols-[1fr_1.3fr] ${showPno ? "lg:col-span-4" : "lg:col-span-6"}`}>
             <div className="relative min-h-64">
               <Image src="/images/open-gym.jpg" alt="Training ninja on your own at open gym" fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover" />
             </div>
@@ -41,56 +52,62 @@ export function More() {
           </Reveal>
 
           {/* Parents Night Out */}
-          <Reveal delay={0.1} className="group relative flex flex-col overflow-hidden rounded-[2rem] bg-ink p-6 text-white sm:p-8 lg:col-span-2">
-            <div className="absolute inset-0 opacity-40 transition-opacity duration-500 group-hover:opacity-60">
-              <Image src="/images/parents-night-2.jpg" alt="" fill sizes="(min-width: 1024px) 30vw, 100vw" className="object-cover" />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/20" />
-            <div className="relative mt-auto pt-32">
-              <span className="rounded-full bg-sun px-3 py-1 text-xs font-bold uppercase tracking-widest text-ink">
-                2nd Saturday monthly
-              </span>
-              <h3 className="mt-4 font-display text-4xl uppercase leading-none">Parents Night Out</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/80">
-                6–9 PM. For just <strong className="text-white">$40 per ninja</strong>, your kids get three
-                hours of fun games and exciting ninja activities. Space is limited and fills up fast!
-              </p>
-              <div className="mt-5">
-                <Button href={links.parentsNight} external>
-                  Reserve a spot
-                </Button>
+          {showPno && (
+            <Reveal delay={0.1} className="group relative flex flex-col overflow-hidden rounded-[2rem] bg-ink p-6 text-white sm:p-8 lg:col-span-2">
+              {pnoImage && (
+                <div className="absolute inset-0 opacity-40 transition-opacity duration-500 group-hover:opacity-60">
+                  <Image src={pnoImage} alt="" fill sizes="(min-width: 1024px) 30vw, 100vw" className="object-cover" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/20" />
+              <div className="relative mt-auto pt-32">
+                {parentsNight.badge && (
+                  <span className="rounded-full bg-sun px-3 py-1 text-xs font-bold uppercase tracking-widest text-ink">
+                    {parentsNight.badge}
+                  </span>
+                )}
+                <h3 className="mt-4 font-display text-4xl uppercase leading-none">{parentsNight.header}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/80">
+                  <RichText text={parentsNight.body} strongClassName="text-white" />
+                </p>
+                <div className="mt-5">
+                  <Button href={parentsNight.href} external={isExternal(parentsNight.href)}>
+                    Reserve a spot
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Reveal>
+            </Reveal>
+          )}
 
           {/* Competitions */}
-          <Reveal className="rounded-[2rem] bg-ninja p-6 text-white sm:p-8 lg:col-span-3">
-            <div className="flex items-center justify-between gap-4">
-              <h3 className="font-display text-4xl uppercase">Competitions @ Intensity</h3>
-            </div>
-            <div className="mt-6 space-y-4">
-              {competitions.map((c) => (
-                <UpcomingOnly key={c.name} end={c.end}>
-                  <div className="rounded-2xl bg-ink/20 p-5 backdrop-blur">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/75">{c.date}</p>
-                    <p className="mt-1 font-display text-2xl uppercase">{c.name}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-white/85">{c.body}</p>
-                    <a
-                      href={c.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-block text-sm font-semibold uppercase tracking-wider underline decoration-2 underline-offset-4 hover:decoration-white/50"
-                    >
-                      {c.cta} →
-                    </a>
-                  </div>
-                </UpcomingOnly>
-              ))}
-            </div>
-          </Reveal>
+          {showComps && (
+            <Reveal className="rounded-[2rem] bg-ninja p-6 text-white sm:p-8 lg:col-span-3">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="font-display text-4xl uppercase">{competitions.header}</h3>
+              </div>
+              <div className="mt-6 space-y-4">
+                {events.map((c) => (
+                      <div key={c.name + c.date} className="rounded-2xl bg-ink/20 p-5 backdrop-blur">
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/75">{c.date}</p>
+                        <p className="mt-1 font-display text-2xl uppercase">{c.name}</p>
+                        <p className="mt-2 text-sm leading-relaxed text-white/85">{c.body}</p>
+                        {c.href && (
+                          <a
+                            href={c.href}
+                            {...(isExternal(c.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                            className="mt-3 inline-block text-sm font-semibold uppercase tracking-wider underline decoration-2 underline-offset-4 hover:decoration-white/50"
+                          >
+                            {c.cta} →
+                          </a>
+                        )}
+                      </div>
+                ))}
+              </div>
+            </Reveal>
+          )}
 
           {/* Recovery */}
-          <Reveal delay={0.1} className="overflow-hidden rounded-[2rem] bg-white shadow-sm lg:col-span-3">
+          <Reveal delay={0.1} className={`overflow-hidden rounded-[2rem] bg-white shadow-sm ${showComps ? "lg:col-span-3" : "lg:col-span-6 lg:grid lg:grid-cols-2 lg:items-center"}`}>
             <div className="grid grid-cols-2">
               <div className="relative aspect-square">
                 <Image src="/images/cold-plunge.jpg" alt="Cold plunge tub" fill sizes="(min-width: 1024px) 20vw, 50vw" className="object-cover" />

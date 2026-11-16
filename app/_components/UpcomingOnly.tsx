@@ -11,10 +11,15 @@ export function useToday() {
   return useSyncExternalStore(subscribe, getToday, getServerToday);
 }
 
-/** Renders children until the `end` date (YYYY-MM-DD) has passed in the visitor's browser. */
+/** True until the `end` date (YYYY-MM-DD) has passed. Blank `end`, or no date yet (prerendering), means show. */
+export function isShowing(end: string, today: string | null) {
+  return !today || !end || end >= today;
+}
+
+/** Renders children until the `end` date (YYYY-MM-DD) has passed in the visitor's browser. A blank `end` never hides. */
 export function UpcomingOnly({ end, children }: { end: string; children: ReactNode }) {
   const today = useToday();
-  if (today && end < today) return null;
+  if (!isShowing(end, today)) return null;
   return <>{children}</>;
 }
 

@@ -1,16 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { campFaq, camps, links, summerCamp } from "../data";
-import { useToday } from "./UpcomingOnly";
+import { campFaq, links } from "../data";
+import { imageSrc, isExternal, useSiteContent } from "./SiteContent";
+import { isShowing, useToday } from "./UpcomingOnly";
 import { Faq } from "./Faq";
 import { Reveal, RevealGroup, RevealItem } from "./Reveal";
 import { Button, SectionHeading } from "./ui";
 
 export function Camps() {
   // Hide camps whose end date has passed (checked in the browser so the static build never goes stale).
+  const { camps, summerCamp } = useSiteContent();
   const today = useToday();
-  const upcoming = today ? camps.filter((c) => c.end >= today) : camps;
+  const upcoming = camps.filter((c) => isShowing(c.end, today));
+  const showSummer = isShowing(summerCamp.end, today);
+  const summerImage = imageSrc(summerCamp.image);
 
   return (
     <section id="camps" className="noise relative overflow-hidden bg-ink bg-grid py-24 sm:py-32">
@@ -23,7 +27,7 @@ export function Camps() {
           intro="High-energy kids camps that build strength, confidence and coordination through ninja training, games and challenges, all inside our safe, indoor facility. Full days or half days! We offer day camps on in-service days and week camps, following the Douglas County School District calendar."
         />
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-[1.25fr_1fr]">
+        <div className={`mt-14 grid gap-6 ${showSummer ? "lg:grid-cols-[1.25fr_1fr]" : ""}`}>
           {/* upcoming dates */}
           <div className="rounded-[2rem] border border-white/10 bg-coal p-6 sm:p-8">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -35,16 +39,16 @@ export function Camps() {
             {upcoming.length > 0 ? (
               <RevealGroup className="mt-6 space-y-3" stagger={0.07}>
                 {upcoming.map((c) => (
-                  <RevealItem key={c.label}>
+                  <RevealItem key={c.title + c.dates}>
                     <a
-                      href={links.campRegister}
+                      href={c.href}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="group flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 transition-all duration-300 hover:border-ninja hover:bg-ninja/10"
                     >
                       <div>
-                        <p className="font-semibold text-white">{c.label}</p>
-                        <p className="text-sm text-mute">{c.dates}</p>
+                        <p className="font-semibold text-white">{c.title}</p>
+                        <p className="text-sm text-mute">{[c.days, c.dates].filter(Boolean).join(" · ")}</p>
                       </div>
                       <span className="shrink-0 text-sm font-semibold uppercase tracking-wider text-ninja-soft transition-transform duration-300 group-hover:translate-x-1">
                         Register →
@@ -64,34 +68,45 @@ export function Camps() {
           </div>
 
           {/* summer camp */}
-          <Reveal delay={0.1} className="relative overflow-hidden rounded-[2rem] bg-ninja p-6 text-white sm:p-8">
-            <div className="absolute right-4 top-4 h-28 w-40 rotate-6 sm:right-6 sm:h-36 sm:w-52">
-              <Image src="/images/summer-camp.png" alt="Summer Camp" fill sizes="240px" className="object-contain" />
-            </div>
-            <p className="relative text-xs font-bold uppercase tracking-[0.2em] text-white/80">Summer camp</p>
-            <p className="relative mt-24 font-display text-4xl uppercase leading-none sm:mt-28 sm:text-5xl">
-              Back for 2027
-            </p>
-            <p className="relative mt-2 text-white/85">{summerCamp.note}</p>
-            <div className="relative mt-6 grid gap-3">
-              {summerCamp.options.map((o) => (
-                <div key={o.name} className="rounded-2xl bg-ink/25 p-4 backdrop-blur">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="font-display text-2xl uppercase">{o.name}</p>
-                    <p className="text-sm text-white/80">{o.time}</p>
-                  </div>
-                  <div className="mt-2 flex gap-6 text-sm">
-                    <span>
-                      <span className="font-display text-2xl">{o.member}</span> members
-                    </span>
-                    <span className="text-white/80">
-                      <span className="font-display text-2xl text-white">{o.nonMember}</span> non-members
-                    </span>
-                  </div>
+          {showSummer && (
+            <Reveal delay={0.1} className="relative overflow-hidden rounded-[2rem] bg-ninja p-6 text-white sm:p-8">
+              {summerImage && (
+                <div className="absolute right-4 top-4 h-28 w-40 rotate-6 sm:right-6 sm:h-36 sm:w-52">
+                  <Image src={summerImage} alt={summerCamp.title} fill sizes="240px" className="object-contain" />
                 </div>
-              ))}
-            </div>
-          </Reveal>
+              )}
+              <p className="relative text-xs font-bold uppercase tracking-[0.2em] text-white/80">{summerCamp.title}</p>
+              <p className="relative mt-24 font-display text-4xl uppercase leading-none sm:mt-28 sm:text-5xl">
+                {summerCamp.header}
+              </p>
+              <p className="relative mt-2 text-white/85">{summerCamp.body}</p>
+              <div className="relative mt-6 grid gap-3">
+                {summerCamp.options.filter((o) => o.name).map((o) => (
+                  <div key={o.name} className="rounded-2xl bg-ink/25 p-4 backdrop-blur">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="font-display text-2xl uppercase">{o.name}</p>
+                      <p className="text-sm text-white/80">{o.time}</p>
+                    </div>
+                    <div className="mt-2 flex gap-6 text-sm">
+                      <span>
+                        <span className="font-display text-2xl">{o.member}</span> members
+                      </span>
+                      <span className="text-white/80">
+                        <span className="font-display text-2xl text-white">{o.nonMember}</span> non-members
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {summerCamp.href && (
+                <div className="relative mt-6">
+                  <Button href={summerCamp.href} variant="light" external={isExternal(summerCamp.href)}>
+                    Register for summer camp
+                  </Button>
+                </div>
+              )}
+            </Reveal>
+          )}
         </div>
 
         <div className="mt-6">
