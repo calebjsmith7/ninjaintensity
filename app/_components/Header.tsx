@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { business, links, nav } from "../data";
 import { isExternal, useSiteContent } from "./SiteContent";
@@ -102,14 +102,7 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <a
-              href={links.youthWaiver}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden rounded-full px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:text-white md:block"
-            >
-              Waivers
-            </a>
+            <WaiversMenu />
             <a
               href={business.phoneHref}
               className="hidden items-center gap-2 rounded-full bg-ninja px-5 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-ninja-soft sm:inline-flex"
@@ -180,5 +173,86 @@ export function Header() {
         </AnimatePresence>
       </header>
     </>
+  );
+}
+
+const waivers = [
+  { label: "Youth Waiver", note: "Under 18 — signed by a parent or guardian", href: links.youthWaiver },
+  { label: "Adult Waiver", note: "18 and over", href: links.adultWaiver },
+];
+
+function WaiversMenu() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside or pressing Escape
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative hidden md:block">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+          open ? "text-white" : "text-white/70 hover:text-white"
+        }`}
+      >
+        Waivers
+        <svg
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+          className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            role="menu"
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 top-full mt-2 w-64 origin-top-right overflow-hidden rounded-2xl border border-white/10 bg-ink/95 p-1.5 shadow-2xl backdrop-blur-xl"
+          >
+            {waivers.map((w) => (
+              <a
+                key={w.href}
+                role="menuitem"
+                href={w.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="block rounded-xl px-4 py-3 transition-colors hover:bg-white/10"
+              >
+                <span className="block text-sm font-semibold text-white">{w.label}</span>
+                <span className="block text-xs text-white/60">{w.note}</span>
+              </a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

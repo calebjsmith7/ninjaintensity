@@ -77,7 +77,8 @@ export type Program = {
   imageAlt: string;
   body: string[];
   highlights: string[];
-  pricing: { label: string; price: string }[];
+  /** One row per price. `classes` lists every class that costs this much. */
+  pricing: { price: string; detail?: string; classes: string[] }[];
   schedule?: string[];
   note?: string;
 };
@@ -101,13 +102,22 @@ export const programs: Program[] = [
       "Flexible evening class times",
     ],
     pricing: [
-      { label: "Pee Wee Ninjas (4–5) · 1x week", price: "$115/mo" },
-      { label: "Mini Ninjas (6–7) · 1x week", price: "$115/mo" },
-      { label: "Beginner Youth (8–12), Teen (13–17) or Adult · 1x week", price: "$115/mo" },
-      { label: "Beginner Youth, Teen or Adult · 2x week", price: "$210/mo" },
-      { label: "Intermediate (test required) · 1x week", price: "$115/mo" },
-      { label: "Elite (test required) · 90 min · 1x week", price: "$160/mo" },
+      {
+        price: "$115/mo",
+        detail: "1x week",
+        classes: [
+          "Pee Wee (4–5)",
+          "Mini (6–7)",
+          "Beginner Youth (8–12)",
+          "Teen (13–17)",
+          "Adult",
+          "Intermediate*",
+        ],
+      },
+      { price: "$210/mo", detail: "2x week", classes: ["Beginner Youth", "Teen", "Adult"] },
+      { price: "$160/mo", detail: "1x week · 90 min", classes: ["Elite*"] },
     ],
+    note: "*Intermediate and Elite require a skills test.",
   },
   {
     id: "parkour",
@@ -126,10 +136,7 @@ export const programs: Program[] = [
       "Coach-led progressions",
       "Great base for ninja athletes",
     ],
-    pricing: [
-      { label: "Beginner Parkour (10+) · 1x week", price: "$115/mo" },
-      { label: "Teen Parkour (13+) · 1x week", price: "$115/mo" },
-    ],
+    pricing: [{ price: "$115/mo", detail: "1x week", classes: ["Beginner Parkour (10+)", "Teen Parkour (13+)"] }],
   },
   {
     id: "ocr",
@@ -148,7 +155,7 @@ export const programs: Program[] = [
       "Endurance + functional fitness",
       "Race strategy & pacing",
     ],
-    pricing: [{ label: "OCR Training (13+) · 1x week", price: "$115/mo" }],
+    pricing: [{ price: "$115/mo", detail: "1x week", classes: ["OCR Training (13+)"] }],
     schedule: ["Tuesday & Wednesday · 6:45 PM"],
   },
   {
@@ -168,10 +175,7 @@ export const programs: Program[] = [
       "Agility & change of direction",
       "Injury prevention & movement mechanics",
     ],
-    pricing: [
-      { label: "Sports Performance (Youth) · 1x week", price: "$115/mo" },
-      { label: "Sports Performance (13+) · 1x week", price: "$115/mo" },
-    ],
+    pricing: [{ price: "$115/mo", detail: "1x week", classes: ["Youth", "13+"] }],
     schedule: ["Youth: Wednesday & Friday · 5:30 PM", "13+: Tuesday & Wednesday · 6:45 PM"],
   },
   {
@@ -192,10 +196,10 @@ export const programs: Program[] = [
       "A motivating community",
     ],
     pricing: [
-      { label: "First-time trial class", price: "FREE" },
-      { label: "6 session pass", price: "$75" },
-      { label: "12 session pass", price: "$140" },
-      { label: "Unlimited (billed monthly)", price: "$100/mo" },
+      { price: "FREE", classes: ["First-time trial class"] },
+      { price: "$75", classes: ["6 session pass"] },
+      { price: "$140", classes: ["12 session pass"] },
+      { price: "$100/mo", classes: ["Unlimited (billed monthly)"] },
     ],
     schedule: ["Monday – Friday · 4:15 PM & 5:30 PM"],
   },

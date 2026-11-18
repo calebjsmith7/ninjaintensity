@@ -122,14 +122,33 @@ export function Programs() {
                     Pricing
                   </div>
                   <ul className="divide-y divide-white/10">
-                    {p.pricing.map((row) => (
-                      <li key={row.label} className="flex items-center justify-between gap-4 px-5 py-3.5">
-                        <span className="text-sm text-white/80">{row.label}</span>
-                        <span className="shrink-0 font-display text-2xl text-white">{row.price}</span>
-                      </li>
-                    ))}
+                    {p.pricing.map((row) => {
+                      const chips = row.classes.length > 1;
+                      return (
+                        <li key={row.price + row.detail} className="flex items-center justify-between gap-4 px-5 py-3.5">
+                          <div className="min-w-0">
+                            {row.detail && (
+                              <p className="text-xs font-semibold uppercase tracking-widest text-mute">{row.detail}</p>
+                            )}
+                            {chips ? (
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {row.classes.map((c) => (
+                                  <span key={c} className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-white/80">
+                                    {c}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className={`text-sm text-white/80 ${row.detail ? "mt-0.5" : ""}`}>{row.classes[0]}</p>
+                            )}
+                          </div>
+                          <span className="shrink-0 font-display text-2xl text-white">{row.price}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
+                {p.note && <p className="mt-3 text-xs text-white/50">{p.note}</p>}
 
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Button href={business.phoneHref}>Call to register</Button>
