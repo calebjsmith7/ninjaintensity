@@ -11,6 +11,7 @@ export const business = {
   mapsUrl: "https://maps.google.com/?q=2275+Manatt+Ct,+Castle+Rock,+CO+80104",
   mapEmbed:
     "https://www.google.com/maps?q=2275+Manatt+Ct,+Castle+Rock,+CO+80104&output=embed",
+  url: "https://www.ninjaintensity.com",
   serving: "Serving Castle Rock, Castle Pines, Parker, Monument and South Denver.",
   social: {
     instagram: "https://www.instagram.com/ninjaintensity",
@@ -307,6 +308,12 @@ export const openGym = {
     { day: "Sunday", time: "6:00–8:00 PM", who: "Family Night · Ages 5+", price: "$15" },
   ],
   note: "Non-member safety orientation required ($5 additional). No-tolerance rule: break the rules more than twice and you'll be asked to leave.",
+};
+
+export const recovery = {
+  name: "Ni Recovery Room",
+  body: "The perfect place for athletes, parents, and anyone in need of recovery. Our cold plunge helps aid recovery, reduce inflammation and stress, and boost immunity. Red light therapy, backed by over 6,000 published studies, can speed recovery, improve sleep and more.",
+  prices: ["$10 for one", "$15 for the combo", "Ask about unlimited monthly"],
 };
 
 // Entries whose `end` date has passed hide automatically ("" = never hide).

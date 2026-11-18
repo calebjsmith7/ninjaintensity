@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { openGym } from "../data";
+import { openGym, recovery } from "../data";
 import { Reveal } from "./Reveal";
 import { RichText, imageSrc, isExternal, useSiteContent } from "./SiteContent";
 import { Button, SectionHeading } from "./ui";
@@ -117,16 +117,19 @@ export function More() {
               </div>
             </div>
             <div className="p-6 sm:p-8">
-              <h3 className="font-display text-4xl uppercase">Ni Recovery Room</h3>
-              <p className="mt-2 leading-relaxed text-ink/70">
-                The perfect place for athletes, parents, and anyone in need of recovery. Our cold
-                plunge helps aid recovery, reduce inflammation and stress, and boost immunity. Red light
-                therapy, backed by over 6,000 published studies, can speed recovery, improve sleep and more.
-              </p>
+              <h3 className="font-display text-4xl uppercase">{recovery.name}</h3>
+              <p className="mt-2 leading-relaxed text-ink/70">{recovery.body}</p>
               <div className="mt-5 flex flex-wrap gap-2">
-                <span className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">$10 for one</span>
-                <span className="rounded-full bg-ninja px-4 py-2 text-sm font-semibold text-white">$15 for the combo</span>
-                <span className="rounded-full border border-ink/15 px-4 py-2 text-sm">Ask about unlimited monthly</span>
+                {recovery.prices.map((label, i) => (
+                  <span
+                    key={label}
+                    className={`rounded-full px-4 py-2 text-sm ${
+                      i === 0 ? "bg-ink font-semibold text-white" : i === 1 ? "bg-ninja font-semibold text-white" : "border border-ink/15"
+                    }`}
+                  >
+                    {label}
+                  </span>
+                ))}
               </div>
             </div>
           </Reveal>
