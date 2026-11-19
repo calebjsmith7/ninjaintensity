@@ -14,6 +14,7 @@ const interests = [
   "Birthday party",
   "Camps",
   "Team building",
+  "Field trip",
   "Something else",
 ];
 

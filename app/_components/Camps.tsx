@@ -24,7 +24,7 @@ export function Camps() {
           eyebrow="Seasonal camps"
           title="School's out."
           accent="Ninja's in."
-          intro="High-energy kids camps that build strength, confidence and coordination through ninja training, games and challenges, all inside our safe, indoor facility. Full days or half days! We offer day camps on in-service days and week camps, following the Douglas County School District calendar."
+          intro="High-energy kids camps that build strength, confidence and coordination through ninja training, games and challenges, all inside our safe, indoor facility. Full days or half days! We offer day camps on in-service days and week camps, following the Douglas County School District calendar. For all camps - call for same day drop-ins!"
         />
 
         <div className={`mt-14 grid gap-6 ${showSummer ? "lg:grid-cols-[1.25fr_1fr]" : ""}`}>

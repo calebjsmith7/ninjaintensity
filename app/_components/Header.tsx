@@ -13,14 +13,20 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
-  const { announcement } = useSiteContent();
+  const { announcement, parentsNight, competitions } = useSiteContent();
   const today = useToday();
+  // Drop links to cards that are currently hidden (past Parents Night Out / no upcoming comps).
+  const hidden = new Set<string>();
+  if (!isShowing(parentsNight.end, today)) hidden.add("#parents-night");
+  if (!competitions.events.some((c) => isShowing(c.end, today))) hidden.add("#competitions");
+  const navItems = nav.filter((n) => !hidden.has(n.href));
+  const navKey = navItems.map((n) => n.href).join();
 
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 40));
 
   // Highlight the nav item for the section currently in view
   useEffect(() => {
-    const ids = nav.map((n) => n.href.slice(1));
+    const ids = navKey.split(",").map((h) => h.slice(1));
     const observer = new IntersectionObserver(
       (entries) => {
         for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
@@ -32,7 +38,7 @@ export function Header() {
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, []);
+  }, [navKey]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -63,7 +69,7 @@ export function Header() {
       >
         <div
           className={`mx-auto flex max-w-7xl items-center justify-between px-4 transition-all duration-300 sm:px-6 ${
-            scrolled ? "h-16" : "h-20"
+            scrolled ? "h-16 lg:h-[4.5rem]" : "h-20 lg:h-24"
           }`}
         >
           <a href="#top" className="relative shrink-0" aria-label="Ninja Intensity home">
@@ -73,12 +79,12 @@ export function Header() {
               width={1000}
               height={630}
               priority
-              className={`w-auto transition-all duration-300 ${scrolled ? "h-9" : "h-12"}`}
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-9 lg:h-12" : "h-12 lg:h-16"}`}
             />
           </a>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
-            {nav.map((item) => {
+            {navItems.map((item) => {
               const isActive = active === item.href.slice(1);
               return (
                 <a
@@ -105,10 +111,12 @@ export function Header() {
             <WaiversMenu />
             <a
               href={business.phoneHref}
-              className="hidden items-center gap-2 rounded-full bg-ninja px-5 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-ninja-soft sm:inline-flex"
+              aria-label={`Call ${business.phone}`}
+              className="hidden items-center gap-2 rounded-full bg-ninja px-5 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-ninja-soft sm:inline-flex lg:max-xl:px-3"
             >
               <Phone className="h-4 w-4" />
-              {business.phone}
+              {/* icon-only between lg and xl so the full nav fits */}
+              <span className="lg:max-xl:sr-only">{business.phone}</span>
             </a>
             <button
               type="button"
@@ -135,10 +143,10 @@ export function Header() {
               animate={{ opacity: 1, height: "100dvh" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-x-0 top-0 -z-10 overflow-hidden bg-ink lg:hidden"
+              className="fixed inset-x-0 top-0 -z-10 overflow-y-auto overscroll-contain bg-ink lg:hidden"
             >
-              <nav className="flex h-full flex-col justify-center gap-1 px-8" aria-label="Mobile">
-                {nav.map((item, i) => (
+              <nav className="flex min-h-full flex-col justify-center gap-1 px-8 pb-10 pt-36" aria-label="Mobile">
+                {navItems.map((item, i) => (
                   <motion.a
                     key={item.href}
                     href={item.href}
@@ -146,7 +154,7 @@ export function Header() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.08 + i * 0.05 }}
-                    className="font-display text-5xl uppercase text-white transition-colors hover:text-ninja"
+                    className="font-display text-4xl uppercase text-white transition-colors hover:text-ninja sm:text-5xl"
                   >
                     {item.label}
                   </motion.a>
@@ -155,7 +163,7 @@ export function Header() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="mt-10 flex flex-col gap-3 text-white/70"
+                  className="mt-8 flex flex-col gap-3 text-white/70"
                 >
                   <a href={business.phoneHref} className="text-xl font-semibold text-white">
                     {business.phone}

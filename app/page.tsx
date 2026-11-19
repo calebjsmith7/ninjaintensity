@@ -10,7 +10,7 @@ import { More } from "./_components/More";
 import { Parties } from "./_components/Parties";
 import { Programs } from "./_components/Programs";
 import { SiteContentProvider } from "./_components/SiteContent";
-import { Team } from "./_components/Team";
+import { FieldTrips, Team } from "./_components/Team";
 
 export default function Home() {
   return (
@@ -25,6 +25,7 @@ export default function Home() {
         <Camps />
         <More />
         <Team />
+        <FieldTrips />
         <Gallery />
         <Contact />
       </main>

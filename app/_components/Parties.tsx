@@ -92,7 +92,7 @@ export function Parties() {
                   </div>
                 ))}
               </dl>
-              <p className="mt-4 text-sm font-semibold text-ink/60">Ages 5+. Ages 2-4 allowed with accompanying parent</p>
+              <p className="mt-4 text-sm font-semibold text-ink/60">Ages 5+. 2 to 4 year-olds welcome to attend with adult on floor with them.</p>
             </Reveal>
           </div>
         </div>

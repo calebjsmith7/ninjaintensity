@@ -85,7 +85,7 @@ export function Hero() {
             className="mt-6 max-w-xl text-lg leading-relaxed text-mute"
           >
             Warped walls, salmon ladders, parkour, parties and camps, coached by people who love
-            this stuff. Classes for kids ages 3 and up, teens and adults.{" "}
+            this stuff. Classes for kids ages 4 and up, teens and adults.{" "}
             <span className="text-white/90">{business.serving}</span>
           </motion.p>
 
@@ -143,7 +143,7 @@ export function Hero() {
             className="absolute -left-2 top-6 animate-float rounded-2xl bg-sun px-4 py-3 font-display text-xl uppercase leading-none text-ink shadow-xl [--r:-8deg] sm:-left-6"
             style={{ animationDelay: "-2s" }}
           >
-            Ages 3<span className="text-ninja">+</span>
+            Ages 4<span className="text-ninja">+</span>
             <span className="block font-sans text-[10px] font-bold tracking-widest">to adults</span>
           </div>
           <div className="absolute -right-1 top-1/2 animate-float whitespace-nowrap rounded-full bg-white px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-ink shadow-xl [--r:6deg] sm:-right-4 sm:px-5 sm:py-3 sm:text-xs">

@@ -6,6 +6,7 @@ import {
   campFaq,
   camps,
   competitions,
+  fieldTrips,
   links,
   membershipNotes,
   obstacles,
@@ -33,7 +34,7 @@ function build() {
 
   parts.push(`# ${business.name}
 
-> ${business.name} is a ninja warrior gym in Castle Rock, Colorado offering kids, teen and adult ninja warrior classes, parkour, obstacle course race (OCR) training, sports performance, adult fitness (NiFIT), birthday parties, school break and summer camps, open gym, Parents Night Out, competitions, a cold plunge and red light recovery room, and corporate team building. ${business.serving}
+> ${business.name} is a ninja warrior gym in Castle Rock, Colorado offering kids, teen and adult ninja warrior classes, parkour, obstacle course race (OCR) training, sports performance, adult fitness (NiFIT), birthday parties, school break and summer camps, open gym, Parents Night Out, competitions, a cold plunge and red light recovery room, corporate team building, and field trips for schools and groups. ${business.serving}
 
 - Address: ${business.street}, ${business.cityLine}
 - Phone: ${business.phone}
@@ -138,14 +139,31 @@ ${list(team.focus)}
 Perfect for:
 ${list(team.perfectFor)}`);
 
+  parts.push(`## Field Trips
+
+${fieldTrips.intro}
+
+${fieldTrips.body}
+
+Trip lengths: ${fieldTrips.durations.join(", ")}
+
+Focus:
+${list(fieldTrips.focus)}
+
+Perfect for:
+${list(fieldTrips.perfectFor)}`);
+
   parts.push(`## Links
 
 - [Home page](${u}/): full site with all of the above
 - [Classes](${u}/#classes)
 - [Birthday parties](${u}/#parties)
 - [Camps](${u}/#camps)
-- [Open gym, Parents Night Out, competitions and recovery](${u}/#more)
+- [Parents Night Out](${u}/#parents-night)
+- [Competitions](${u}/#competitions)
+- [Recovery room and open gym](${u}/#more)
 - [Team building](${u}/#team)
+- [Field trips](${u}/#field-trips)
 - [Contact and waivers](${u}/#contact)
 - [Camp and class registration](${links.campRegister})
 - [Youth waiver](${links.youthWaiver})

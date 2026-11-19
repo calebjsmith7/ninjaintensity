@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { business, membershipNotes, programs } from "../data";
+import { MediaSlideshow } from "./MediaSlideshow";
 import { Reveal } from "./Reveal";
 import { Button, Check, SectionHeading } from "./ui";
 
@@ -73,7 +73,7 @@ export function Programs() {
                 transition={{ duration: 0.8, ease: [0.65, 0, 0.35, 1] }}
                 className="relative aspect-[4/5] overflow-hidden rounded-3xl sm:aspect-[4/3] lg:aspect-auto lg:min-h-[34rem]"
               >
-                <Image src={p.image} alt={p.imageAlt} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+                <MediaSlideshow items={p.media} sizes="(min-width: 1024px) 40vw, 100vw" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/0 to-ink/0" />
                 <span className="absolute left-4 top-4 rounded-full bg-ink/80 px-4 py-2 text-xs font-bold uppercase tracking-widest text-white backdrop-blur">
                   {p.ages}

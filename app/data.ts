@@ -1,4 +1,5 @@
 // All site copy lives here so prices, dates and schedules can be updated in one place.
+import type { Media } from "./_components/MediaSlideshow";
 
 export const business = {
   name: "Ninja Intensity",
@@ -53,7 +54,8 @@ export const nav = [
   { label: "Classes", href: "#classes" },
   { label: "Parties", href: "#parties" },
   { label: "Camps", href: "#camps" },
-  { label: "Open Gym", href: "#more" },
+  { label: "Parents Night", href: "#parents-night" },
+  { label: "Competitions", href: "#competitions" },
   { label: "Team Building", href: "#team" },
   { label: "Contact", href: "#contact" },
 ];
@@ -74,8 +76,8 @@ export type Program = {
   name: string;
   tagline: string;
   ages: string;
-  image: string;
-  imageAlt: string;
+  /** Featured photos/videos, shown as a rotating slideshow. Videos: .mp4 or .webm in /public/videos. */
+  media: Media[];
   body: string[];
   highlights: string[];
   /** One row per price. `classes` lists every class that costs this much. */
@@ -90,8 +92,11 @@ export const programs: Program[] = [
     name: "Ninja",
     tagline: "Ninja Warrior Classes",
     ages: "Ages 4 → Adults",
-    image: "/images/ninja-class.jpg",
-    imageAlt: "Ninja student leaping between hanging obstacles",
+    media: [
+      { src: "/images/ninja-class.jpg", alt: "Ninja student leaping between hanging obstacles" },
+      { src: "/images/home-1.jpg", alt: "Kid swinging across ninja obstacles" },
+      { src: "/images/team-2.jpg", alt: "Athlete topping the warped wall" },
+    ],
     body: [
       "As seen on American Ninja Warrior, students will be introduced to all of the staple obstacles such as the Warped Wall, Spider Wall, Salmon Ladder, and many more!",
       "Classes are available to kids, teens and adults. Students are instructed on how to complete each obstacle with different techniques. We strive to be one of the best ninja warrior gyms in Colorado!",
@@ -125,8 +130,10 @@ export const programs: Program[] = [
     name: "Parkour",
     tagline: "Parkour Classes",
     ages: "Ages 10+",
-    image: "/images/parkour-kong.jpg",
-    imageAlt: "Athlete vaulting over a parkour box",
+    media: [
+      { src: "/images/parkour-kong.jpg", alt: "Athlete vaulting over a parkour box" },
+      { src: "/images/parkour-area.jpg", alt: "The parkour area" },
+    ],
     body: [
       "Parkour is the art of moving from one obstacle to another in a quick, safe and efficient manner. Many ninja warrior athletes have a parkour background.",
       "With our amazing parkour zone and extensive knowledge of coaching and efficient class structure, we promise the best parkour learning environment any location has to offer.",
@@ -144,8 +151,10 @@ export const programs: Program[] = [
     name: "OCR",
     tagline: "Obstacle Course Race Training",
     ages: "Ages 13+",
-    image: "/images/ocr-rope.jpg",
-    imageAlt: "Athlete climbing a rope during OCR training",
+    media: [
+      { src: "/images/ocr-rope.jpg", alt: "Athlete climbing a rope during OCR training" },
+      { src: "/images/ocr-1.jpg", alt: "OCR athlete climbing over a wall" },
+    ],
     body: [
       "Train for any obstacle. Build real strength. Have fun doing it. OCR Training combines strength, conditioning, and obstacle technique to prepare you for races like Spartan, Tough Mudder, and local competitions, while also being an incredible full-body workout.",
       "You'll train on real obstacles in a structured, coach-led environment. We don't just train. You'll be part of a community that pushes each other to get better!",
@@ -164,8 +173,9 @@ export const programs: Program[] = [
     name: "Sports Performance",
     tagline: "Get Faster. Stronger. More Explosive.",
     ages: "Youth & 13+",
-    image: "/images/sports-performance.jpg",
-    imageAlt: "Athletes in a sports performance class",
+    media: [
+      { src: "/images/sports-performance.jpg", alt: "Athletes in a sports performance class" },
+    ],
     body: [
       "Our Sports Performance program helps athletes of all levels improve speed, strength, agility, and overall athleticism, so they can dominate in their sport.",
       "Football, soccer, basketball, baseball/softball, lacrosse, wrestling and more. If your sport requires speed, strength, and coordination, we've got you covered.",
@@ -184,8 +194,10 @@ export const programs: Program[] = [
     name: "NiFIT",
     tagline: "Get Your Workout In While Your Kids Train",
     ages: "Adults",
-    image: "/images/nifit-2.jpg",
-    imageAlt: "Adult fitness class at Ninja Intensity",
+    media: [
+      { src: "/images/nifit-2.jpg", alt: "Adult fitness class at Ninja Intensity" },
+      { src: "/images/nifit-1.jpg", alt: "Athlete on a ring swing" },
+    ],
     body: [
       "Life is busy. We get it. NiFIT is our group fitness program for adults who want an effective, fun workout in a supportive environment, right here while your kids are in class.",
       "No distractions. No scrolling your phone. No sitting on the sidelines. This is your time. Stop watching practice. Be part of it.",
@@ -358,6 +370,26 @@ export const team = {
     "Sales teams & leadership groups",
     "Employee appreciation events",
     "Company retreats",
+  ],
+};
+
+export const fieldTrips = {
+  intro:
+    "Bring your class, troop, or group for an action-packed field trip on real American Ninja Warrior obstacles. Active, safe, and something your students will talk about for weeks.",
+  body: "Our coaches lead every group through warm-ups, skill stations, and a fun ninja challenge, adapted to every age and ability so everyone gets in on the action. We handle the planning and the coaching; you just bring the crew.",
+  durations: ["1 hr", "1.5 hr", "2 hr"],
+  focus: [
+    "Coach-led, structured activities",
+    "Teamwork & encouragement",
+    "Confidence through new challenges",
+    "Healthy, active fun",
+  ],
+  perfectFor: [
+    "School classes & grade levels",
+    "Homeschool groups",
+    "Scout troops",
+    "Church & youth groups",
+    "Sports teams & clubs",
   ],
 };
 
